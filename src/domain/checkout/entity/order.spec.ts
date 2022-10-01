@@ -20,18 +20,15 @@ describe("Order unit tests", () => {
     }).toThrowError("Items are required");
   });
 
-  it("should calculate total", () => {
-    const item = new OrderItem("i1", "Item 1", 100, "p1", 2);
-    const item2 = new OrderItem("i2", "Item 2", 200, "p2", 2);
-    const order = new Order("o1", "c1", [item]);
+  it('should calculate total', () => {
+    const item = new OrderItem("123", "Item Test", 100, "123", 2)
+    const item2 = new OrderItem("321", "Item Test", 200, "123", 2)
 
-    let total = order.total();
+    const order = new Order("123", "321", [item, item2])
 
-    expect(order.total()).toBe(200);
+    const total = order.total()
 
-    const order2 = new Order("o1", "c1", [item, item2]);
-    total = order2.total();
-    expect(total).toBe(600);
+    expect(total).toEqual(600)
   });
 
   it("should throw error if the item qte is less or equal zero 0", () => {

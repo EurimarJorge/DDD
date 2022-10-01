@@ -9,13 +9,13 @@ export default class OrderRepository implements OrderRepositoryInterface {
     await OrderModel.create(
       {
         id: entity.id,
-        customer_id: entity.customerId,
+        customerId: entity.customerId,
         total: entity.total(),
         items: entity.items.map((item) => ({
           id: item.id,
           name: item.name,
           price: item.price,
-          product_id: item.productId,
+          productId: item.productId,
           quantity: item.quantity,
         })),
       },
@@ -28,7 +28,7 @@ export default class OrderRepository implements OrderRepositoryInterface {
   async update(entity: Order): Promise<void> {
     await OrderModel.update(
       {
-        customer_id: entity.customerId,
+        customerid: entity.customerId,
         total: entity.total(),
         items: entity.items.map((item) => ({
           id: item.id,
@@ -63,37 +63,31 @@ export default class OrderRepository implements OrderRepositoryInterface {
       items[0].id,
       items[0].name,
       items[0].price,
-      items[0].product_id,
+      items[0].productId,
       items[0].quantity
     );
 
-    const order = new Order(id, orderModel.customer_id, [item]);
+    const order = new Order(id, orderModel.customerId, [item]);
     return order;
   }
 
   async findAll(): Promise<Order[]> {
-    const orderModels = await OrderModel.findAll();
+    const orders = await OrderModel.findAll({ include: [{ model: OrderItemModel }] })    
+    return orders.map(order => {
+      const orderItems: Array<OrderItem> = []
 
-    const orders = orderModels.map((orderModels) => {
-      const items = orderModels.items;
-      const item1 = new OrderItem(
-        items[0].id,
-        items[0].name,
-        items[0].price,
-        items[0].product_id,
-        items[0].quantity
-      );
-      const item2 = new OrderItem(
-        items[1].id,
-        items[1].name,
-        items[1].price,
-        items[1].product_id,
-        items[1].quantity
-      );
-      const order = new Order(orderModels.id, orderModels.customer_id,[item1, item2]);
-      return order;
+      for (const iterator of order.items) {
+        orderItems.push(new OrderItem(iterator.id, iterator.name, iterator.price, iterator.productId, iterator.quantity))
+      }
+
+      return new Order(order.id, order.customerId, orderItems)
     });
-
-    return orders;
   }
+
+
+
+
+
+
+
 }
